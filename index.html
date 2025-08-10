@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HeinX AI Assistant</title>
     <script src="http://js.puter.com/v1/puter.js"></script>
+    <script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Now Puter is loaded
+    Puter.ai.chat({ model: "gpt-4", messages: [{ role: "user", content: "Hello" }] })
+        .then(res => console.log(res))
+        .catch(err => console.error(err));
+});
+</script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -352,3 +360,4 @@
 </body>
 
 </html>
+

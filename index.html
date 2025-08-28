@@ -1,12 +1,279 @@
 <html>
+<head>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .chat-container {
+            width: 100%;
+            max-width: 500px;
+            height: 700px;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-header {
+            background: linear-gradient(90deg, #4e54c8, #8f94fb);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: #f8f9fa;
+        }
+        
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            line-height: 1.4;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .user-message {
+            align-self: flex-end;
+            background: #4e54c8;
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .ai-message {
+            align-self: flex-start;
+            background: #e9ecef;
+            color: #333;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .chat-input-container {
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 24px;
+            outline: none;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .chat-input:focus {
+            border-color: #4e54c8;
+        }
+        
+        .send-button {
+            background: #4e54c8;
+            color: white;
+            border: none;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            margin-left: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.3s;
+        }
+        
+        .send-button:hover {
+            background: #3a3eb3;
+        }
+        
+        .send-button svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+        }
+        
+        .typing-indicator {
+            display: inline-block;
+            padding: 12px 16px;
+            background: #e9ecef;
+            border-radius: 18px;
+            border-bottom-left-radius: 5px;
+            align-self: flex-start;
+            color: #666;
+        }
+        
+        .typing-dots {
+            display: flex;
+            align-items: center;
+            height: 17px;
+        }
+        
+        .typing-dots span {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #999;
+            display: inline-block;
+            margin-right: 4px;
+            animation: typing 1.4s infinite both;
+        }
+        
+        .typing-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-5px);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
 <body>
+    <div class="chat-container">
+        <div class="chat-header">
+            Puter AI Assistant
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <div class="message ai-message">
+                <div class="typing-indicator">
+                    <div class="typing-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="chat-input-container">
+            <input type="text" class="chat-input" id="user-input" placeholder="Type your message here...">
+            <button class="send-button" id="send-button">
+                <svg viewBox="0 0 24 24">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+
     <script src="https://js.puter.com/v2/"></script>
     <script>
-        // Loading ...
-        puter.print(`Loading...`);
-
-        // Chat with GPT-4.1 nano
-        puter.ai.chat(`What model you currently on?`).then(puter.print);
+        // DOM elements
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        
+        // Function to add a message to the chat
+        function addMessage(text, isUser) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(isUser ? 'user-message' : 'ai-message');
+            messageDiv.textContent = text;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Function to show typing indicator
+        function showTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.classList.add('message', 'ai-message');
+            typingDiv.innerHTML = `
+                <div class="typing-indicator">
+                    <div class="typing-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            `;
+            typingDiv.id = 'typing-indicator';
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Function to remove typing indicator
+        function removeTypingIndicator() {
+            const typingIndicator = document.getElementById('typing-indicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+        
+        // Send message function
+        function sendMessage() {
+            const message = userInput.value.trim();
+            if (message) {
+                addMessage(message, true);
+                userInput.value = '';
+                
+                showTypingIndicator();
+                
+                // Send to Puter AI
+                puter.ai.chat(message).then(response => {
+                    removeTypingIndicator();
+                    addMessage(response, false);
+                }).catch(error => {
+                    removeTypingIndicator();
+                    addMessage("Sorry, I encountered an error. Please try again.", false);
+                    console.error(error);
+                });
+            }
+        }
+        
+        // Event listeners
+        sendButton.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Initial loading message
+        setTimeout(() => {
+            removeTypingIndicator();
+            addMessage("Hello! I'm Puter AI. How can I assist you today?", false);
+        }, 1500);
     </script>
 </body>
 </html>

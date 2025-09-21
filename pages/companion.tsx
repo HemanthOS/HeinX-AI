@@ -196,7 +196,7 @@ export default function CompanionSetup({ onSetupComplete }: CompanionSetupProps)
                 <label className="block text-sm font-medium text-gray-700 mb-2">Your Name</label>
                 <input
                   type="text"
-                  placeholder="Enter your name"
+                  placeholder="Ex: john"
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
                   className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors text-gray-800"

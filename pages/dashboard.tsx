@@ -29,18 +29,17 @@ export default function HeinXDashboard() {
   const [isTyping, setIsTyping] = useState(false);
   const [voiceMode, setVoiceMode] = useState(false);
   const [studyTopic, setStudyTopic] = useState("");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
 
-  // Check screen size for mobile responsiveness
+  // Make sidebar default depend on actual viewport width (safe for SSR)
+  const getInitialSidebar = () => (typeof window !== 'undefined' ? window.innerWidth >= 1024 : false);
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(getInitialSidebar);
+  const [isMobile, setIsMobile] = useState<boolean>(typeof window !== 'undefined' ? window.innerWidth < 1024 : false);
+
   useEffect(() => {
     const checkScreenSize = () => {
-      setIsMobile(window.innerWidth < 1024);
-      if (window.innerWidth >= 1024) {
-        setSidebarOpen(true);
-      } else {
-        setSidebarOpen(false);
-      }
+      const mobile = window.innerWidth < 1024;
+      setIsMobile(mobile);
+      setSidebarOpen(!mobile);
     };
 
     checkScreenSize();
@@ -171,15 +170,9 @@ export default function HeinXDashboard() {
 
   const tabs = currentMode === 'personal' ? personalTabs : studyTabs;
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
-
   const handleTabClick = (tabId: string) => {
     setActiveTab(tabId);
-    if (isMobile) {
-      setSidebarOpen(false);
-    }
+    if (isMobile) setSidebarOpen(false);
   };
 
   const renderPersonalTabContent = () => {
@@ -215,11 +208,11 @@ export default function HeinXDashboard() {
               </div>
             </div>
 
-            {/* Chat Area - Clean, minimal chat interface */}
+            {/* Chat Area - responsive height for mobile */}
             <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-              <div className="h-96 overflow-y-auto p-6 space-y-4 bg-gray-50/50">
+              <div className="p-6 bg-gray-50/50 overflow-y-auto" style={{ maxHeight: isMobile ? '50vh' : '24rem' }}>
                 {messages.map((msg, i) => (
-                  <div key={i} className={`flex ${msg.sender === 'You' ? 'justify-end' : 'justify-start'}`}>
+                  <div key={i} className={`flex ${msg.sender === 'You' ? 'justify-end' : 'justify-start'} mb-3`}>
                     <div className={`max-w-md px-4 py-3 rounded-lg ${
                       msg.sender === 'You'
                         ? 'bg-indigo-600 text-white'
@@ -242,13 +235,14 @@ export default function HeinXDashboard() {
                   </div>
                 )}
               </div>
-              <div className="p-4 border-t border-gray-200">
+
+              <div className="p-4 border-t border-gray-200 bg-white">
                 <div className="flex space-x-2">
                   <input
                     type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                    onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
                     placeholder={`Message ${user.aiName}...`}
                     className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none text-gray-900"
                   />
@@ -297,7 +291,6 @@ export default function HeinXDashboard() {
               ))}
             </div>
 
-            {/* AI Goal Coaching - Subdued gradient */}
             <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-6">
               <div className="flex items-center mb-4">
                 <Target className="w-6 h-6 mr-3 text-indigo-600" />
@@ -341,7 +334,6 @@ export default function HeinXDashboard() {
               </div>
             ))}
 
-            {/* AI Memory - Clean list */}
             <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
               <div className="flex items-center mb-4">
                 <Brain className="w-6 h-6 text-indigo-600 mr-3" />
@@ -362,7 +354,6 @@ export default function HeinXDashboard() {
       case 'growth':
         return (
           <div className="space-y-6">
-            {/* Growth Stats - Professional cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
                 <div className="flex items-center justify-between">
@@ -398,7 +389,6 @@ export default function HeinXDashboard() {
               </div>
             </div>
 
-            {/* Growth Chart - Simple bar chart */}
             <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Progress Metrics</h3>
               <div className="h-64 flex items-end justify-between space-x-2">
@@ -416,7 +406,6 @@ export default function HeinXDashboard() {
               </div>
             </div>
 
-            {/* Achievement - Neutral tone */}
             <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
               <div className="flex items-center space-x-4">
                 <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center">
@@ -438,7 +427,6 @@ export default function HeinXDashboard() {
       case 'learn':
         return (
           <div className="space-y-6">
-            {/* Topic Search - Clean search bar */}
             <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <div>
@@ -455,7 +443,7 @@ export default function HeinXDashboard() {
                   type="text"
                   value={studyTopic}
                   onChange={(e) => setStudyTopic(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleStudySearch()}
+                  onKeyDown={(e) => e.key === 'Enter' && handleStudySearch()}
                   placeholder="Search for a topic..."
                   className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none text-gray-900"
                 />
@@ -468,7 +456,6 @@ export default function HeinXDashboard() {
               </div>
             </div>
 
-            {/* Recommended Topics - Grid cards */}
             <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Suggested Topics</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -492,7 +479,6 @@ export default function HeinXDashboard() {
               </div>
             </div>
 
-            {/* Recent Learning - List view */}
             <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Resume Learning</h3>
               <div className="space-y-4">
@@ -520,7 +506,6 @@ export default function HeinXDashboard() {
       case 'progress':
         return (
           <div className="space-y-6">
-            {/* Overall Progress - Simple progress bar */}
             <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
@@ -533,14 +518,10 @@ export default function HeinXDashboard() {
                 </div>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2 mt-4">
-                <div
-                  className="bg-teal-600 h-2 rounded-full transition-all duration-500"
-                  style={{ width: `64%` }}
-                ></div>
+                <div className="bg-teal-600 h-2 rounded-full transition-all duration-500" style={{ width: `64%` }}></div>
               </div>
             </div>
 
-            {/* Subject Progress - Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {studySubjects.map((subject, index) => (
                 <div key={index} className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
@@ -549,10 +530,7 @@ export default function HeinXDashboard() {
                     <span className="text-2xl font-bold text-gray-900">{subject.progress}%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-                    <div
-                      className="bg-teal-600 h-2 rounded-full transition-all duration-500"
-                      style={{ width: `${subject.progress}%` }}
-                    ></div>
+                    <div className="bg-teal-600 h-2 rounded-full transition-all duration-500" style={{ width: `${subject.progress}%` }}></div>
                   </div>
                   <div className="flex justify-between text-sm text-gray-600">
                     <span>{subject.mastered} / {subject.topics} mastered</span>
@@ -562,19 +540,13 @@ export default function HeinXDashboard() {
               ))}
             </div>
 
-            {/* Weekly Study Time - Bar chart */}
             <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Weekly Activity</h3>
               <div className="h-48 flex items-end justify-between space-x-2">
                 {[3, 5, 2, 4, 6, 2, 4].map((hours, index) => (
                   <div key={index} className="flex-1 flex flex-col items-center">
-                    <div
-                      className="w-full bg-teal-600 rounded-t-lg transition-all duration-1000 hover:bg-teal-700"
-                      style={{ height: `${hours * 10}%` }}
-                    ></div>
-                    <span className="text-xs text-gray-500 mt-2">
-                      {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][index]}
-                    </span>
+                    <div className="w-full bg-teal-600 rounded-t-lg transition-all duration-1000 hover:bg-teal-700" style={{ height: `${hours * 10}%` }}></div>
+                    <span className="text-xs text-gray-500 mt-2">{['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][index]}</span>
                     <span className="text-xs font-medium text-gray-700 mt-1">{hours}h</span>
                   </div>
                 ))}
@@ -586,7 +558,6 @@ export default function HeinXDashboard() {
       case 'resources':
         return (
           <div className="space-y-6">
-            {/* Resource Library - Header card */}
             <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
@@ -599,7 +570,6 @@ export default function HeinXDashboard() {
               </div>
             </div>
 
-            {/* Resource Categories - Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {['Lectures', 'Exercises', 'Guides'].map((category, index) => (
                 <div key={index} className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm text-center">
@@ -609,27 +579,19 @@ export default function HeinXDashboard() {
                      <BookOpen className="w-8 h-8 text-teal-600" />}
                   </div>
                   <h3 className="font-semibold text-gray-900 mb-2">{category}</h3>
-                  <p className="text-gray-600 text-sm mb-4">
-                    {category === 'Lectures' ? '32 sessions' :
-                     category === 'Exercises' ? '45 sets' : '18 documents'}
-                  </p>
-                  <button className="bg-teal-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors">
-                    View
-                  </button>
+                  <p className="text-gray-600 text-sm mb-4">{category === 'Lectures' ? '32 sessions' : category === 'Exercises' ? '45 sets' : '18 documents'}</p>
+                  <button className="bg-teal-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors">View</button>
                 </div>
               ))}
             </div>
 
-            {/* Recent Resources - List */}
             <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Latest Additions</h3>
               <div className="space-y-4">
                 {studyResources.map((resource, index) => (
                   <div key={index} className="flex items-center p-4 border border-gray-200 rounded-lg hover:shadow-md transition-all">
                     <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                      {resource.type === 'Video Lecture' ? <Video className="w-6 h-6 text-teal-600" /> :
-                       resource.type === 'Practice Set' ? <BookOpen className="w-6 h-6 text-teal-600" /> :
-                       <BarChart3 className="w-6 h-6 text-teal-600" />}
+                      {resource.type === 'Video Lecture' ? <Video className="w-6 h-6 text-teal-600" /> : resource.type === 'Practice Set' ? <BookOpen className="w-6 h-6 text-teal-600" /> : <BarChart3 className="w-6 h-6 text-teal-600" />}
                     </div>
                     <div className="ml-4 flex-1">
                       <h4 className="font-semibold text-gray-900">{resource.title}</h4>
@@ -654,7 +616,6 @@ export default function HeinXDashboard() {
       case 'tests':
         return (
           <div className="space-y-6">
-            {/* Test Preparation - Header */}
             <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
@@ -667,7 +628,6 @@ export default function HeinXDashboard() {
               </div>
             </div>
 
-            {/* Upcoming Tests - List */}
             <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Scheduled Assessments</h3>
               <div className="space-y-4">
@@ -679,24 +639,19 @@ export default function HeinXDashboard() {
                   <div key={index} className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-all">
                     <div className="flex items-center justify-between mb-3">
                       <h4 className="font-semibold text-gray-900">{test.name}</h4>
-                      <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-medium">
-                        {test.date}
-                      </span>
+                      <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-medium">{test.date}</span>
                     </div>
                     <div className="flex items-center text-sm text-gray-600 mb-4">
                       <span>{test.questions} questions</span>
                       <span className="mx-2">•</span>
                       <span>{test.duration}</span>
                     </div>
-                    <button className="w-full bg-teal-600 text-white py-2 rounded-lg font-medium hover:bg-teal-700 transition-colors">
-                      Begin Assessment
-                    </button>
+                    <button className="w-full bg-teal-600 text-white py-2 rounded-lg font-medium hover:bg-teal-700 transition-colors">Begin Assessment</button>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Performance Analytics - Grid */}
             <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Performance Metrics</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -723,7 +678,6 @@ export default function HeinXDashboard() {
               </div>
             </div>
 
-            {/* Recent Test Results - List */}
             <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Outcomes</h3>
               <div className="space-y-4">
@@ -745,9 +699,7 @@ export default function HeinXDashboard() {
                       <p className={`font-bold ${
                         test.score >= 90 ? 'text-green-600' :
                         test.score >= 70 ? 'text-yellow-600' : 'text-red-600'
-                      }`}>
-                        {test.score}%
-                      </p>
+                      }`}>{test.score}%</p>
                       <p className="text-sm text-gray-600">{test.score}/{test.total}</p>
                     </div>
                   </div>
@@ -763,19 +715,64 @@ export default function HeinXDashboard() {
     return currentMode === 'personal' ? renderPersonalTabContent() : renderStudyTabContent();
   };
 
+  // Sidebar content reused for desktop and mobile
+  const SidebarContent = () => (
+    <div>
+      <nav className="space-y-2 mt-4 lg:mt-0">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => handleTabClick(tab.id)}
+            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+              activeTab === tab.id
+                ? currentMode === 'personal'
+                  ? 'bg-indigo-600 text-white'
+                  : 'bg-teal-600 text-white'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`}>
+            <tab.icon className="w-5 h-5" />
+            <span className="font-medium">{tab.label}</span>
+          </button>
+        ))}
+      </nav>
+
+      <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+        <h3 className="font-semibold text-gray-900 mb-3">Overview</h3>
+        <div className="space-y-2 text-sm">
+          <div className="flex justify-between">
+            <span className="text-gray-600">Today's {currentMode === 'personal' ? 'XP' : 'Hours'}</span>
+            <span className={`font-medium ${currentMode === 'personal' ? 'text-indigo-600' : 'text-teal-600'}`}>
+              {currentMode === 'personal' ? '+125' : '2.5h'}
+            </span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-600">{currentMode === 'personal' ? 'Objective Progress' : 'Mastery Level'}</span>
+            <span className="font-medium text-green-600">{currentMode === 'personal' ? '67%' : '64%'}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-600">Sessions</span>
+            <span className="font-medium text-indigo-600">23</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <div className={`min-h-screen bg-gray-50`}>
-      {/* Header - Clean, professional navbar */}
+    <div className={`min-h-screen bg-gray-50 flex flex-col`}> 
+      {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <button
-                onClick={toggleSidebar}
+                onClick={() => setSidebarOpen(prev => !prev)}
                 className="lg:hidden p-2 rounded-md text-gray-700 hover:bg-gray-100"
+                aria-label="Toggle menu"
               >
                 {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
+
               <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
                 <Sparkles className="w-6 h-6 text-white" />
               </div>
@@ -785,24 +782,15 @@ export default function HeinXDashboard() {
               </div>
             </div>
 
-            {/* Mode Toggle - Subtle switch */}
             <div className="flex items-center space-x-2 sm:space-x-4">
-              <span className={`text-xs sm:text-sm font-medium ${currentMode === 'personal' ? 'text-indigo-600' : 'text-gray-500'}`}>
-                Personal
-              </span>
+              <span className={`text-xs sm:text-sm font-medium ${currentMode === 'personal' ? 'text-indigo-600' : 'text-gray-500'}`}>Personal</span>
               <button
                 onClick={() => setCurrentMode(currentMode === 'personal' ? 'study' : 'personal')}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full ${
-                  currentMode === 'personal' ? 'bg-indigo-600' : 'bg-teal-600'
-                }`}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full ${currentMode === 'personal' ? 'bg-indigo-600' : 'bg-teal-600'}`}
               >
-                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  currentMode === 'personal' ? 'translate-x-1' : 'translate-x-6'
-                }`} />
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${currentMode === 'personal' ? 'translate-x-1' : 'translate-x-6'}`} />
               </button>
-              <span className={`text-xs sm:text-sm font-medium ${currentMode === 'study' ? 'text-teal-600' : 'text-gray-500'}`}>
-                Study
-              </span>
+              <span className={`text-xs sm:text-sm font-medium ${currentMode === 'study' ? 'text-teal-600' : 'text-gray-500'}`}>Study</span>
             </div>
 
             <div className="flex items-center space-x-2 sm:space-x-4">
@@ -821,91 +809,32 @@ export default function HeinXDashboard() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-        <div className="flex">
-          {/* Sidebar - Navigation and stats */}
-          <div className={`
-            ${sidebarOpen ? 'block' : 'hidden'} 
-            lg:block lg:w-1/4 xl:w-1/5 
-            fixed lg:static inset-0 z-40 
-            bg-white lg:bg-transparent
-          `}>
-            {/* Mobile overlay */}
-            {sidebarOpen && isMobile && (
-              <div 
-                className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
-                onClick={() => setSidebarOpen(false)}
-              ></div>
-            )}
-            
-            <div className={`
-              bg-white border border-gray-200 rounded-xl p-6 shadow-sm 
-              h-full lg:h-auto lg:sticky lg:top-24
-              w-80 lg:w-full max-w-full
-              fixed left-0 top-0 bottom-0 z-40 lg:relative
-              overflow-y-auto
-            `}>
-              {/* Close button for mobile */}
-              {isMobile && (
-                <button
-                  onClick={() => setSidebarOpen(false)}
-                  className="absolute top-4 right-4 p-2 text-gray-500 hover:text-gray-700 lg:hidden"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              )}
-
-              <nav className="space-y-2 mt-4 lg:mt-0">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => handleTabClick(tab.id)}
-                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-                      activeTab === tab.id
-                        ? currentMode === 'personal'
-                          ? 'bg-indigo-600 text-white'
-                          : 'bg-teal-600 text-white'
-                        : 'text-gray-700 hover:bg-gray-100'
-                    }`}
-                  >
-                    <tab.icon className="w-5 h-5" />
-                    <span className="font-medium">{tab.label}</span>
-                  </button>
-                ))}
-              </nav>
-
-              {/* Quick Stats - Compact */}
-              <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <h3 className="font-semibold text-gray-900 mb-3">Overview</h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Today's {currentMode === 'personal' ? 'XP' : 'Hours'}</span>
-                    <span className={`font-medium ${
-                      currentMode === 'personal' ? 'text-indigo-600' : 'text-teal-600'
-                    }`}>
-                      {currentMode === 'personal' ? '+125' : '2.5h'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">{currentMode === 'personal' ? 'Objective Progress' : 'Mastery Level'}</span>
-                    <span className="font-medium text-green-600">
-                      {currentMode === 'personal' ? '67%' : '64%'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Sessions</span>
-                    <span className="font-medium text-indigo-600">23</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+      {/* Page content area */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex flex-1 w-full">
+        {/* Desktop sidebar (in-flow) */}
+        <aside className="hidden lg:block lg:w-1/4 xl:w-1/5 flex-shrink-0">
+          <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm lg:sticky lg:top-24">
+            <SidebarContent />
           </div>
+        </aside>
 
-          {/* Main Content - Dynamic tabs */}
-          <div className="flex-1 lg:ml-6">
-            {renderTabContent()}
+        {/* Mobile overlay sidebar (out-of-flow) */}
+        {sidebarOpen && isMobile && (
+          <div className="lg:hidden fixed inset-0 z-40 flex">
+            <div className="absolute inset-0 bg-black bg-opacity-40" onClick={() => setSidebarOpen(false)} aria-hidden />
+            <aside className="relative w-80 max-w-full bg-white h-full p-6 overflow-y-auto shadow-xl">
+              <button onClick={() => setSidebarOpen(false)} className="absolute top-4 right-4 p-2 text-gray-500 hover:text-gray-700">
+                <X className="w-5 h-5" />
+              </button>
+              <SidebarContent />
+            </aside>
           </div>
-        </div>
+        )}
+
+        {/* Main content */}
+        <main className="flex-1 lg:pl-6">
+          {renderTabContent()}
+        </main>
       </div>
     </div>
   );

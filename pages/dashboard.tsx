@@ -24,7 +24,7 @@ export default function HeinXDashboard() {
   const [activeTab, setActiveTab] = useState('chat');
   const [messages, setMessages] = useState([
     { sender: "Nova", text: "Good morning, John! I've analyzed your recent activity. Ready to optimize your day?", timestamp: "9:23 AM", type: "motivational" },
-    { sender: "You", text: "Yes, let's achieve my goals.", timestamp: "9:24 AM" }
+    { sender: "You", text: "Yes, let's achieve my goals.", timestamp: "9:14 AM" }
   ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);

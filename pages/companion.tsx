@@ -199,7 +199,7 @@ export default function CompanionSetup({ onSetupComplete }: CompanionSetupProps)
                   placeholder="Enter your name"
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
+                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors text-gray-800"
                 />
               </div>
               
@@ -210,7 +210,7 @@ export default function CompanionSetup({ onSetupComplete }: CompanionSetupProps)
                   placeholder="Your age"
                   value={formData.age}
                   onChange={(e) => setFormData({...formData, age: e.target.value})}
-                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
+                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors text-gray-800"
                 />
               </div>
               
@@ -221,7 +221,7 @@ export default function CompanionSetup({ onSetupComplete }: CompanionSetupProps)
                   placeholder="What do you do?"
                   value={formData.profession}
                   onChange={(e) => setFormData({...formData, profession: e.target.value})}
-                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
+                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors text-gray-800"
                 />
               </div>
             </div>
@@ -244,7 +244,7 @@ export default function CompanionSetup({ onSetupComplete }: CompanionSetupProps)
                   placeholder="Enter your name"
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-colors"
+                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-colors text-gray-800"
                 />
               </div>
               
@@ -255,7 +255,7 @@ export default function CompanionSetup({ onSetupComplete }: CompanionSetupProps)
                   placeholder="Your age"
                   value={formData.age}
                   onChange={(e) => setFormData({...formData, age: e.target.value})}
-                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-colors"
+                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-colors text-gray-800"
                 />
               </div>
               
@@ -264,7 +264,7 @@ export default function CompanionSetup({ onSetupComplete }: CompanionSetupProps)
                 <select
                   value={formData.educationLevel}
                   onChange={(e) => setFormData({...formData, educationLevel: e.target.value})}
-                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-colors"
+                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-colors text-gray-800"
                 >
                   <option value="">Select your level</option>
                   {educationLevels.map(level => (
@@ -299,7 +299,7 @@ export default function CompanionSetup({ onSetupComplete }: CompanionSetupProps)
                       newGoals[index] = e.target.value;
                       setFormData({...formData, goals: newGoals});
                     }}
-                    className="flex-1 p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
+                    className="flex-1 p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors text-gray-800"
                   />
                   {index > 0 && (
                     <button
@@ -343,7 +343,7 @@ export default function CompanionSetup({ onSetupComplete }: CompanionSetupProps)
                   placeholder="e.g., Computer Science, Medicine, Business"
                   value={formData.major}
                   onChange={(e) => setFormData({...formData, major: e.target.value})}
-                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-colors"
+                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-colors text-gray-800"
                 />
               </div>
               
@@ -352,7 +352,7 @@ export default function CompanionSetup({ onSetupComplete }: CompanionSetupProps)
                 <select
                   value={formData.targetExam}
                   onChange={(e) => setFormData({...formData, targetExam: e.target.value})}
-                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-colors"
+                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-colors text-gray-800"
                 >
                   <option value="">Select target exam</option>
                   {targetExams.map(exam => (
@@ -375,7 +375,7 @@ export default function CompanionSetup({ onSetupComplete }: CompanionSetupProps)
                           newSubjects[index] = e.target.value;
                           setFormData({...formData, subjects: newSubjects});
                         }}
-                        className="flex-1 p-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-colors"
+                        className="flex-1 p-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-colors text-gray-800"
                       />
                       {index > 0 && (
                         <button
@@ -423,7 +423,7 @@ export default function CompanionSetup({ onSetupComplete }: CompanionSetupProps)
                 placeholder="What should I call your AI companion?"
                 value={formData.aiName}
                 onChange={(e) => setFormData({...formData, aiName: e.target.value})}
-                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors mb-6"
+                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors mb-6 text-gray-800"
               />
             </div>
 
@@ -463,7 +463,7 @@ export default function CompanionSetup({ onSetupComplete }: CompanionSetupProps)
               <select
                 value={formData.studyPace}
                 onChange={(e) => setFormData({...formData, studyPace: e.target.value as any})}
-                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-colors"
+                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-colors text-gray-800"
               >
                 <option value="relaxed">Relaxed (1-2 hours/day)</option>
                 <option value="moderate">Moderate (3-4 hours/day)</option>

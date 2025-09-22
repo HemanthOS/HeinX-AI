@@ -1,248 +1,308 @@
-import { useRouter } from "next/router";
-import { useState } from "react";
-import {
-  Video,
-  BookOpen,
-  FileText,
-  MessageCircle,
-  Brain,
-  Target,
-  User,
-  BarChart,
-} from "lucide-react";
+import React, { useState } from 'react';
+import { User, Brain, Target, Heart, Sparkles, ArrowRight, Crown } from 'lucide-react';
 
-type Message = {
-  sender: string;
-  text: string;
-  timestamp: string;
-  type?: string;
-};
+// Add this interface for navigation props
+interface CompanionSetupProps {
+  onSetupComplete: () => void;
+}
 
-type Insight = {
-  title: string;
-  description: string;
-  impact: string;
-  icon: React.ElementType;
-  color: string;
-};
-
-export default function CompanionOnboarding() {
-  const router = useRouter();
-
-  // Onboarding state
+export default function CompanionSetup({ onSetupComplete }: CompanionSetupProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState({
-    name: "",
-    age: "",
-    profession: "",
-    goals: "",
-    tone: "",
+    name: '',
+    age: '',
+    profession: '',
+    goals: '',
+    tone: 'friendly',
+    interests: '',
+    aiName: '',
+    personality: 'supportive',
+    communicationStyle: 'conversational',
+    focusAreas: [],
+    aiAvatar: 'neural'
   });
 
-  // Chat state
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      sender: "Nova",
-      text: "Hey! I'm Nova, your personal companion. Ready to start?",
-      timestamp: "10:00 AM",
-      type: "motivational",
-    },
-    {
-      sender: "You",
-      text: "Yes, let's go!",
-      timestamp: "10:01 AM",
-    },
-  ]);
-  const [input, setInput] = useState("");
-
-  // Study topic state
-  const [studyTopicInput, setStudyTopicInput] = useState("");
-  const studyTopics = ["AI", "Mathematics", "Philosophy", "Physics"];
-
-  // Insights
-  const insights: Insight[] = [
-    {
-      title: "Consistency Matters",
-      description: "You've studied AI for 5 days in a row.",
-      impact: "Great habit-building!",
-      icon: Brain,
-      color: "bg-purple-100",
-    },
-    {
-      title: "Peak Hours",
-      description: "You focus best between 9-11 AM.",
-      impact: "Optimize your study schedule.",
-      icon: Target,
-      color: "bg-green-100",
-    },
+  const steps = [
+    { icon: User, title: "Personal Info", subtitle: "Tell us about yourself" },
+    { icon: Brain, title: "AI Personality", subtitle: "Craft your perfect companion" },
+    { icon: Target, title: "Goals & Interests", subtitle: "Define your journey" },
+    { icon: Heart, title: "Relationship Style", subtitle: "How should HeinX interact?" }
   ];
 
-  // Mock resources
-  const resources = [
-    { title: "Intro to AI", type: "Video Lecture" },
-    { title: "Linear Algebra Basics", type: "PDF Notes" },
-    { title: "AI Weekly Newsletter", type: "Article" },
+  const personalities = [
+    { id: 'mentor', name: 'Wise Mentor', desc: 'Guides with wisdom and experience', emoji: '🧙‍♂️' },
+    { id: 'friend', name: 'Best Friend', desc: 'Casual, supportive, always there', emoji: '😊' },
+    { id: 'coach', name: 'Life Coach', desc: 'Motivational and goal-focused', emoji: '💪' },
+    { id: 'analyst', name: 'Strategic Analyst', desc: 'Data-driven and logical', emoji: '🤖' }
   ];
 
-  // Handlers
+  const avatars = [
+    { id: 'neural', name: 'Neural', gradient: 'from-purple-500 to-blue-500' },
+    { id: 'cosmic', name: 'Cosmic', gradient: 'from-indigo-500 to-purple-600' },
+    { id: 'zen', name: 'Zen', gradient: 'from-green-400 to-blue-500' },
+    { id: 'fire', name: 'Fire', gradient: 'from-orange-400 to-red-500' }
+  ];
+
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
-      setCurrentStep((prev) => prev + 1);
+      setCurrentStep(currentStep + 1);
+    } else {
+      // Save data and redirect to dashboard
+      const data = { ...formData };
+      console.log('Companion created:', data);
+      alert('🎉 Your HeinX AI companion is ready! Redirecting to dashboard...');
+      // Call the navigation function to redirect to dashboard
+      onSetupComplete();
     }
   };
 
-  const handleChange = (key: keyof typeof formData, value: string) => {
-    setFormData({ ...formData, [key]: value });
-  };
-
-  const sendMessage = () => {
-    if (!input.trim()) return;
-    const newMessage: Message = {
-      sender: "You",
-      text: input,
-      timestamp: new Date().toLocaleTimeString(),
-    };
-    setMessages([...messages, newMessage]);
-    setInput("");
-  };
-
-  const steps = [
-    { label: "Name", key: "name", placeholder: "Enter your name" },
-    { label: "Age", key: "age", placeholder: "Enter your age" },
-    { label: "Profession", key: "profession", placeholder: "e.g., Student, Engineer" },
-    { label: "Goals", key: "goals", placeholder: "What are your main goals?" },
-    { label: "Tone", key: "tone", placeholder: "Friendly, Motivational, Professional" },
-  ];
-
-  return (
-    <div className="p-6 space-y-6">
-      {/* Onboarding Flow */}
-      {currentStep < steps.length ? (
-        <div className="bg-white p-6 rounded-2xl shadow-md max-w-lg mx-auto">
-          <h2 className="text-xl font-semibold mb-4">
-            {steps[currentStep].label}
-          </h2>
-          <input
-            type="text"
-            placeholder={steps[currentStep].placeholder}
-            value={formData[steps[currentStep].key as keyof typeof formData]}
-            onChange={(e) =>
-              handleChange(
-                steps[currentStep].key as keyof typeof formData,
-                e.target.value
-              )
-            }
-            className="w-full p-3 border rounded-xl mb-4"
-          />
-          <button
-            onClick={handleNext}
-            className="px-6 py-2 bg-indigo-600 text-white rounded-xl"
-          >
-            Next
-          </button>
-        </div>
-      ) : (
-        <div className="bg-white p-6 rounded-2xl shadow-md max-w-lg mx-auto text-center">
-          <h2 className="text-2xl font-bold mb-4">Welcome, {formData.name}!</h2>
-          <p className="mb-6">Your profile is ready. Let’s get started 🚀</p>
-          <button
-            onClick={() => router.push("/dashboard")}
-            className="px-6 py-3 bg-green-600 text-white rounded-xl font-semibold"
-          >
-            Set up my profile
-          </button>
-        </div>
-      )}
-
-      {/* Chat Section */}
-      <div className="bg-white p-6 rounded-2xl shadow-md">
-        <h3 className="text-lg font-semibold mb-4">Chat with Nova</h3>
-        <div className="h-64 overflow-y-auto mb-4 border rounded-xl p-3">
-          {messages.map((msg, idx) => (
-            <div key={idx} className="mb-2">
-              <span className="font-semibold">{msg.sender}: </span>
-              <span>{msg.text}</span>
-              <div className="text-xs text-gray-500">{msg.timestamp}</div>
+  const renderStep = () => {
+    switch (currentStep) {
+      case 0:
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <User className="w-10 h-10 text-white" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">Let's get to know you</h2>
+              <p className="text-gray-600">This helps HeinX understand and adapt to you</p>
             </div>
-          ))}
-        </div>
-        <div className="flex space-x-2">
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-            className="flex-1 p-2 border rounded-xl"
-            placeholder="Type a message..."
-          />
-          <button
-            onClick={sendMessage}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-xl"
-          >
-            Send
-          </button>
-        </div>
-      </div>
+            
+            <div className="space-y-4">
+              <input
+                type="text"
+                placeholder="Your name"
+                value={formData.name}
+                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
+              />
+              <input
+                type="number"
+                placeholder="Age"
+                value={formData.age}
+                onChange={(e) => setFormData({...formData, age: e.target.value})}
+                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
+              />
+              <input
+                type="text"
+                placeholder="Profession/Role"
+                value={formData.profession}
+                onChange={(e) => setFormData({...formData, profession: e.target.value})}
+                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
+              />
+            </div>
+          </div>
+        );
+        
+      case 1:
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <Brain className="w-10 h-10 text-white" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">Design Your AI Companion</h2>
+              <p className="text-gray-600">Choose personality and appearance</p>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">AI Name</label>
+              <input
+                type="text"
+                placeholder="What should I call your AI?"
+                value={formData.aiName}
+                onChange={(e) => setFormData({...formData, aiName: e.target.value})}
+                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
+              />
+            </div>
 
-      {/* Study Topics */}
-      <div className="bg-white p-6 rounded-2xl shadow-md">
-        <h3 className="text-lg font-semibold mb-4">Study Topics</h3>
-        <div className="flex space-x-2 mb-4">
-          {studyTopics.map((topic, idx) => (
-            <span
-              key={idx}
-              className="px-3 py-1 bg-gray-100 rounded-full text-sm"
-            >
-              {topic}
-            </span>
-          ))}
-        </div>
-        <input
-          value={studyTopicInput}
-          onChange={(e) => setStudyTopicInput(e.target.value)}
-          placeholder="Add a new topic"
-          className="w-full p-2 border rounded-xl"
-        />
-      </div>
-
-      {/* Insights */}
-      <div className="bg-white p-6 rounded-2xl shadow-md">
-        <h3 className="text-lg font-semibold mb-4">Your Insights</h3>
-        <div className="space-y-3">
-          {insights.map((insight, idx) => (
-            <div
-              key={idx}
-              className={`flex items-center p-4 rounded-xl ${insight.color}`}
-            >
-              <insight.icon className="w-6 h-6 text-indigo-600 mr-3" />
-              <div>
-                <h4 className="font-semibold">{insight.title}</h4>
-                <p className="text-sm">{insight.description}</p>
-                <span className="text-xs text-gray-600">{insight.impact}</span>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">Personality Type</label>
+              <div className="grid grid-cols-2 gap-3">
+                {personalities.map((p) => (
+                  <div
+                    key={p.id}
+                    onClick={() => setFormData({...formData, personality: p.id})}
+                    className={`p-4 border-2 rounded-xl cursor-pointer transition-all ${
+                      formData.personality === p.id 
+                        ? 'border-blue-500 bg-blue-50' 
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="text-2xl mb-2">{p.emoji}</div>
+                    <div className="font-medium text-gray-800">{p.name}</div>
+                    <div className="text-sm text-gray-600">{p.desc}</div>
+                  </div>
+                ))}
               </div>
             </div>
-          ))}
-        </div>
-      </div>
 
-      {/* Resources */}
-      <div className="bg-white p-6 rounded-2xl shadow-md">
-        <h3 className="text-lg font-semibold mb-4">Learning Resources</h3>
-        <div className="space-y-3">
-          {resources.map((resource, idx) => (
-            <div
-              key={idx}
-              className="flex items-center p-3 border rounded-xl"
-            >
-              {resource.type === "Video Lecture" ? (
-                <Video className="w-5 h-5 text-indigo-600 mr-3" />
-              ) : resource.type === "PDF Notes" ? (
-                <FileText className="w-5 h-5 text-green-600 mr-3" />
-              ) : (
-                <BookOpen className="w-5 h-5 text-orange-600 mr-3" />
-              )}
-              <span>{resource.title}</span>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">Avatar Style</label>
+              <div className="flex space-x-3">
+                {avatars.map((avatar) => (
+                  <div
+                    key={avatar.id}
+                    onClick={() => setFormData({...formData, aiAvatar: avatar.id})}
+                    className={`flex-1 h-16 bg-gradient-to-r ${avatar.gradient} rounded-xl cursor-pointer border-4 transition-all ${
+                      formData.aiAvatar === avatar.id ? 'border-white shadow-lg' : 'border-transparent'
+                    }`}
+                  >
+                    <div className="h-full flex items-center justify-center text-white font-medium">
+                      {avatar.name}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-          ))}
+          </div>
+        );
+        
+      case 2:
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-teal-600 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <Target className="w-10 h-10 text-white" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">Your Goals & Interests</h2>
+              <p className="text-gray-600">Help your AI understand what matters to you</p>
+            </div>
+            
+            <textarea
+              placeholder="What are your main goals? (e.g., improve fitness, learn coding, grow business)"
+              value={formData.goals}
+              onChange={(e) => setFormData({...formData, goals: e.target.value})}
+              className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors h-24"
+            />
+            
+            <textarea
+              placeholder="What interests you? (hobbies, topics, activities)"
+              value={formData.interests}
+              onChange={(e) => setFormData({...formData, interests: e.target.value})}
+              className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors h-24"
+            />
+          </div>
+        );
+        
+      case 3:
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <div className="w-20 h-20 bg-gradient-to-r from-pink-500 to-rose-600 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <Heart className="w-10 h-10 text-white" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">Communication Style</h2>
+              <p className="text-gray-600">How should your AI interact with you?</p>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">Tone</label>
+              <select
+                value={formData.tone}
+                onChange={(e) => setFormData({...formData, tone: e.target.value})}
+                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
+              >
+                <option value="friendly">Friendly & Warm</option>
+                <option value="professional">Professional</option>
+                <option value="casual">Casual & Fun</option>
+                <option value="motivational">Motivational</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">Communication Style</label>
+              <select
+                value={formData.communicationStyle}
+                onChange={(e) => setFormData({...formData, communicationStyle: e.target.value})}
+                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
+              >
+                <option value="conversational">Conversational</option>
+                <option value="structured">Structured & Detailed</option>
+                <option value="concise">Short & Concise</option>
+                <option value="storytelling">Story-driven</option>
+              </select>
+            </div>
+
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-xl border border-blue-200">
+              <div className="flex items-center mb-3">
+                <Crown className="w-5 h-5 text-purple-600 mr-2" />
+                <span className="font-semibold text-purple-800">Premium Features Unlocked</span>
+              </div>
+              <ul className="text-sm text-purple-700 space-y-1">
+                <li>• Advanced personality adaptation</li>
+                <li>• Unlimited conversations</li>
+                <li>• Goal tracking & analytics</li>
+                <li>• Custom AI training</li>
+              </ul>
+            </div>
+          </div>
+        );
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-2xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center mb-4">
+              <Sparkles className="w-8 h-8 text-purple-600 mr-2" />
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                HeinX AI
+              </h1>
+            </div>
+            <p className="text-gray-600">Create Your Perfect AI Companion</p>
+          </div>
+
+          {/* Progress Steps */}
+          <div className="flex justify-between mb-8">
+            {steps.map((step, index) => (
+              <div key={index} className="flex flex-col items-center">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all ${
+                  index <= currentStep 
+                    ? 'bg-blue-500 border-blue-500 text-white' 
+                    : 'border-gray-300 text-gray-400'
+                }`}>
+                  <step.icon className="w-6 h-6" />
+                </div>
+                <div className="text-xs text-center mt-2">
+                  <div className="font-medium">{step.title}</div>
+                  <div className="text-gray-500">{step.subtitle}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Form Card */}
+          <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+            {renderStep()}
+
+            {/* Navigation */}
+            <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
+              <button
+                onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
+                disabled={currentStep === 0}
+                className="px-6 py-2 text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Back
+              </button>
+              
+              <div className="text-sm text-gray-500">
+                Step {currentStep + 1} of {steps.length}
+              </div>
+              
+              <button
+                onClick={handleNext}
+                className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all flex items-center"
+              >
+                {currentStep === steps.length - 1 ? 'Complete Setup' : 'Next'}
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
